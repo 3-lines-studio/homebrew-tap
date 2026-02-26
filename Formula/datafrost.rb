@@ -18,8 +18,8 @@ class Datafrost < Formula
   end
 
   depends_on :macos => :big_sur
-  depends_on "gtk+3" => :build if OS.linux?
-  depends_on "webkit2gtk" => :build if OS.linux?
+  depends_on "gtk+3" if OS.linux?
+  depends_on "webkitgtk" if OS.linux?
 
   def install
     bin.install "datafrost"
