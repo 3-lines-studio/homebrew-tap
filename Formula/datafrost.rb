@@ -1,11 +1,11 @@
 class Datafrost < Formula
   desc "Database management GUI application"
   homepage "https://github.com/3-lines-studio/datafrost"
-  version "0.0.2"
+  version "0.0.3"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.2/datafrost-macos-arm64-v0.0.2.tar.gz"
+      url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.3/datafrost-macos-arm64-v0.0.3.tar.gz"
       sha256 "4a3983c221c096da0f1eafa7518895b92e0022dec1dd51cb61b25ce4ffb194ec"
     else
       odie "Intel Macs are not supported. Use --HEAD to build from source, or install on Apple Silicon."
@@ -13,7 +13,7 @@ class Datafrost < Formula
   end
 
   on_linux do
-    url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.2/datafrost-linux-v0.0.2.tar.gz"
+    url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.3/datafrost-linux-v0.0.3.tar.gz"
     sha256 "b640dcd76a1869df8864cd51ab10e35002f0e32d874bddd36b0e89fbf2fb3c9b"
   end
 
