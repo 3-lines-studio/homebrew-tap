@@ -18,8 +18,6 @@ class Datafrost < Formula
   end
 
   depends_on :macos => :big_sur
-  depends_on "gtk+3" if OS.linux?
-  depends_on "webkitgtk" if OS.linux?
 
   def install
     bin.install "datafrost"
@@ -64,42 +62,23 @@ class Datafrost < Formula
 
       Run with: datafrost
 
-      #{OS.macos? ? mac_caveats : linux_caveats}
-    EOS
-  end
-
-  def mac_caveats
-    <<~EOS
-      macOS Security Note:
+      macOS Users:
         This app is unsigned. On first run, you may need to:
         1. Try to run: datafrost
-        2. If blocked, go to: System Preferences > Security & Privacy
+        2. If blocked, go to System Preferences > Security & Privacy
         3. Click "Open Anyway"
-    EOS
-  end
 
-  def linux_caveats
-    <<~EOS
-      Linux Desktop Integration:
-        A desktop entry has been created at:
-          ~/.local/share/applications/datafrost.desktop
+      Linux Users:
+        Desktop entry created at: ~/.local/share/applications/datafrost.desktop
 
-        To refresh your application menu:
-          update-desktop-database ~/.local/share/applications/
-
-      Dependencies:
-        The following packages should be installed (via your package manager):
+        Dependencies (install via your package manager):
           - libwebkit2gtk-4.0
           - libgtk-3-0
 
-        On Ubuntu/Debian:
-          sudo apt-get install libwebkit2gtk-4.0-37 libgtk-3-0
-
-        On Fedora:
-          sudo dnf install webkit2gtk3 gtk3
-
-        On Arch:
-          sudo pacman -S webkit2gtk gtk3
+        Examples:
+          Ubuntu/Debian: sudo apt-get install libwebkit2gtk-4.0-37 libgtk-3-0
+          Fedora:        sudo dnf install webkit2gtk3 gtk3
+          Arch:          sudo pacman -S webkit2gtk gtk3
     EOS
   end
 
