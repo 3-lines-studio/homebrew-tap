@@ -70,9 +70,11 @@ jobs:
           # Update Linux URL
           sed -i "s|url \"https://github.com/3-lines-studio/datafrost/releases/download/v[^/]*/datafrost-linux-v[^\"]*\.tar\.gz\"|url \"https://github.com/3-lines-studio/datafrost/releases/download/v${VERSION}/datafrost-linux-v${VERSION}.tar.gz\"|" Formula/datafrost.rb
           
-          # Update SHA256 placeholders
-          sed -i "s/sha256 \"PLACEHOLDER_MACOS_SHA256\"/sha256 \"${MACOS_SHA}\"/" Formula/datafrost.rb
-          sed -i "s/sha256 \"PLACEHOLDER_LINUX_SHA256\"/sha256 \"${LINUX_SHA}\"/" Formula/datafrost.rb
+          # Update SHA256 checksums using line numbers
+          # Line 9: macOS ARM64 SHA256
+          sed -i "9s/sha256 \"[^\"]*\"/sha256 \"${MACOS_SHA}\"/" Formula/datafrost.rb
+          # Line 17: Linux SHA256
+          sed -i "17s/sha256 \"[^\"]*\"/sha256 \"${LINUX_SHA}\"/" Formula/datafrost.rb
 
       - name: Commit and push
         run: |

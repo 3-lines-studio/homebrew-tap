@@ -6,7 +6,7 @@ class Datafrost < Formula
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.3/datafrost-macos-arm64-v0.0.3.tar.gz"
-      sha256 "4a3983c221c096da0f1eafa7518895b92e0022dec1dd51cb61b25ce4ffb194ec"
+      sha256 "738fc12ea30be371a9cd819fbf9c95dc1e4f12793dc31ad733771c1ce96f329f"
     else
       odie "Intel Macs are not supported. Use --HEAD to build from source, or install on Apple Silicon."
     end
@@ -14,7 +14,7 @@ class Datafrost < Formula
 
   on_linux do
     url "https://github.com/3-lines-studio/datafrost/releases/download/v0.0.3/datafrost-linux-v0.0.3.tar.gz"
-    sha256 "b640dcd76a1869df8864cd51ab10e35002f0e32d874bddd36b0e89fbf2fb3c9b"
+    sha256 "94fe99328cb72966701e40bb9fa5bd40c7c6c742aea8e5b482982da252b02853"
   end
 
   depends_on :macos => :big_sur
@@ -47,7 +47,7 @@ class Datafrost < Formula
       # Create symlink in user's applications directory
       user_apps = Pathname.new(Dir.home)/".local/share/applications"
       user_apps.mkpath
-      
+
       desktop_file = share/"applications/datafrost.desktop"
       if desktop_file.exist?
         FileUtils.ln_sf desktop_file.to_s, (user_apps/"datafrost.desktop").to_s
