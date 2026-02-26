@@ -1,0 +1,90 @@
+name: Update Formula
+
+on:
+  repository_dispatch:
+    types: [new-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update to (e.g., 1.0.0)'
+        required: true
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Updating formula to version: $VERSION"
+
+      - name: Download release assets
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          
+          # Download macOS ARM64
+          MACOS_URL="https://github.com/3-lines-studio/datafrost/releases/download/v${VERSION}/datafrost-macos-arm64-v${VERSION}.tar.gz"
+          echo "Downloading macOS ARM64 from: $MACOS_URL"
+          curl -L -o datafrost-macos-arm64.tar.gz "$MACOS_URL"
+          
+          # Download Linux
+          LINUX_URL="https://github.com/3-lines-studio/datafrost/releases/download/v${VERSION}/datafrost-linux-v${VERSION}.tar.gz"
+          echo "Downloading Linux from: $LINUX_URL"
+          curl -L -o datafrost-linux.tar.gz "$LINUX_URL"
+
+      - name: Calculate SHA256 checksums
+        id: checksums
+        run: |
+          MACOS_SHA=$(sha256sum datafrost-macos-arm64.tar.gz | cut -d' ' -f1)
+          LINUX_SHA=$(sha256sum datafrost-linux.tar.gz | cut -d' ' -f1)
+          
+          echo "MACOS_SHA=$MACOS_SHA" >> $GITHUB_OUTPUT
+          echo "LINUX_SHA=$LINUX_SHA" >> $GITHUB_OUTPUT
+          
+          echo "macOS SHA256: $MACOS_SHA"
+          echo "Linux SHA256: $LINUX_SHA"
+
+      - name: Update formula
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          MACOS_SHA="${{ steps.checksums.outputs.MACOS_SHA }}"
+          LINUX_SHA="${{ steps.checksums.outputs.LINUX_SHA }}"
+          
+          # Update version
+          sed -i "s/version \"[^\"]*\"/version \"${VERSION}\"/" Formula/datafrost.rb
+          
+          # Update macOS URL
+          sed -i "s|url \"https://github.com/3-lines-studio/datafrost/releases/download/v[^/]*/datafrost-macos-arm64-v[^\"]*\.tar\.gz\"|url \"https://github.com/3-lines-studio/datafrost/releases/download/v${VERSION}/datafrost-macos-arm64-v${VERSION}.tar.gz\"|" Formula/datafrost.rb
+          
+          # Update Linux URL
+          sed -i "s|url \"https://github.com/3-lines-studio/datafrost/releases/download/v[^/]*/datafrost-linux-v[^\"]*\.tar\.gz\"|url \"https://github.com/3-lines-studio/datafrost/releases/download/v${VERSION}/datafrost-linux-v${VERSION}.tar.gz\"|" Formula/datafrost.rb
+          
+          # Update SHA256 placeholders
+          sed -i "s/sha256 \"PLACEHOLDER_MACOS_SHA256\"/sha256 \"${MACOS_SHA}\"/" Formula/datafrost.rb
+          sed -i "s/sha256 \"PLACEHOLDER_LINUX_SHA256\"/sha256 \"${LINUX_SHA}\"/" Formula/datafrost.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add Formula/datafrost.rb
+          
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update datafrost to v${{ steps.version.outputs.VERSION }}"
+            git push
+          fi
+
+      - name: Cleanup
+        run: rm -f datafrost-macos-arm64.tar.gz datafrost-linux.tar.gz
